@@ -53,7 +53,7 @@ s5: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (use
 
 As all other wapiflapi's s-series exrs, this is a 64-bit ELF executable with dynamic linking. No big news, let's spawn radare2:
 
-```
+```r2
 $ r2 s5
  -- Finnished a beer
 [0x00400560]> aa
@@ -108,7 +108,7 @@ The first thing to do is making the read call to write into a buffer at a fixed 
 
 Let's do it with ROP. First, find a suitable gadget:
 
-```
+```r2
 [0x0040064d]> e rop.len = 2
 [0x0040064d]> e search.count = 2
 [0x0040064d]> /R rbp
@@ -129,7 +129,7 @@ Chunk Contents   | Chunk length   | Meaning
 
 In order to find a place (`0xTARGET`) to store the shell command, let's enumerate the writable sections:
 
-```
+```r2
 [0x0040068d]> iS | grep perm=..w
 idx=17 vaddr=0x00600e10 paddr=0x00000e10 sz=8 vsz=8 perm=-rw- name=.init_array
 idx=18 vaddr=0x00600e18 paddr=0x00000e18 sz=8 vsz=8 perm=-rw- name=.fini_array
@@ -158,7 +158,7 @@ One way is to overwrite a **.got.plt** entry (one that we don't need for our dar
 
 Let's examine the PLT closely:
 
-```
+```r2
 [0x0040069e]> iS~.got.plt
 idx=22 vaddr=0x00601000 paddr=0x00001000 sz=80 vsz=80 perm=-rw- name=.got.plt
 
@@ -181,7 +181,7 @@ vaddr=0x00400550 paddr=0x00000550 ord=007 fwd=NONE sz=16 bind=GLOBAL type=FUNC n
 
 By choosing the address `0x00601030` as value for 0xTARGET, we'll overwrite the entry for `__libc_start_main` with the bytes of the command "/bin/sh" plus the null terminator, and replace the adjacent entry (in this case `strcmp`) with the address of some useful ROP gadget that will give us back the control of the stack. Let's search for gadgets again, this time we need a pop and a ret (edited for brevity):
 
-```
+```r2
 [0x0040069e]> /R pop
 
 [...]
