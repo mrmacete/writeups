@@ -234,6 +234,6 @@ Here is the command line used to send escaped bytes to stdin:
 ```bash
  while read -r line; do echo -e $line; done | ./s5
 ```
-[![asciicast](https://asciinema.org/a/1paxjmje0fa27p67eau1wwwhi.png)](https://asciinema.org/a/1paxjmje0fa27p67eau1wwwhi)
+[![asciicast](https://asciinema.org/a/8dzqjsi9wfbx3v8ex4pyxqsdo.png)](https://asciinema.org/a/8dzqjsi9wfbx3v8ex4pyxqsdo)
 
 
