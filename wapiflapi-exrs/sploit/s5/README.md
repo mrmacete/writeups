@@ -124,7 +124,7 @@ Good, the first is ok. Now we know three chunks to add to the first buffer:
 Chunk Contents   | Chunk length   | Meaning 
 -----------------| ---------------|----------------
 0x004005a5       | 8 bytes        | Address of "pop rbp; ret" gadget 
-0xTARGET         | 8 bytes        | Address of desired target buffer (still to be chosen)
+0xTARGET+0x20    | 8 bytes        | Address of desired target buffer + 0x20 (still to be chosen)
 0x00400670       | 8 bytes        | Address of the `read` snippet 
 
 In order to find a place (`0xTARGET`) to store the shell command, let's enumerate the writable sections:
