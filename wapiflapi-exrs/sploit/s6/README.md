@@ -155,7 +155,7 @@ Basically there's only one bullet, the goal is to not waste it! Let's look at th
 ```
 So, since we can control `rbp` via `XXXXXXXX` value, it is possible to read again, at a chosen address, by setting `YYYYYYYY` to `0x00400670`.
 
-As anticipated, the idea is that the second `read` call will overwrite 48 bytes of the .got.plt section, so `XXXXXXXX` will be an address in the range of the PLT table.
+As anticipated, the idea is that the second `read` call will overwrite 48 bytes of the .got.plt section, so `XXXXXXXX` will be an address in the range of the PLT table (plus 0x20).
 
 ## Step 2 - hijacking the PLT
 
