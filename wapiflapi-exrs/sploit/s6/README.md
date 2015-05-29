@@ -49,7 +49,7 @@ To spawn a shell
 3. execute `system` using the above command as argument
 4. use the same **.got.plt / stack resonance** method used in [s5 solution](https://github.com/mrmacete/writeups/tree/master/wapiflapi-exrs/sploit/s5)
 
-Maybe there are simpler solutions, but i'm too stupid / lazy to find them.
+Surely there are simpler solutions, but i'm too stupid / lazy to find them.
 
 ## A close look to .got.plt
 As an introduction, it is useful to recap the structure of the .got.plt section, which is interesting because:
