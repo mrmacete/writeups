@@ -108,7 +108,7 @@ To be precise, the dynamic part is changed only before execution of **real** imp
 
 For the purpose of this writeup, though, let's consider only the mere jump pointers as writable, mainly because it's useful to keep the `system` import up and running until the end.
 
-As in the s5 writeup, we'll use the PLT to store both the "/bin/sh" command string to be used as a parameter for `system`, and to hijack the execution in order to **use all bytes of the buffer on the stack** for ROPping and not only the last 16.
+As in the s5 writeup, we'll use the PLT to store both the "/bin/sh" command string to be used as a parameter for `system`, and to hijack the execution in order to **use (almost) all bytes of the buffer on the stack** for ROPping and not only the last 16.
 
 
 ## Step 1 - smashing the stack
