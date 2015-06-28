@@ -62,7 +62,7 @@ Finally i followed the suggestion of wapiflapi in [1] and did a parse of the `li
 
 Since this solution requires a lot of input-output (a repeatable leak is needed) i decided to do it in python. In order to handle the binary input/output i used [binexpect](https://github.com/wapiflapi/binexpect).
 
-The exploit python script is [here](), what follows is a deep explanation of each relevant part of it.
+The exploit python script is [here](https://github.com/mrmacete/writeups/blob/master/wapiflapi-exrs/sploit/s7/bexpl_s7.py), what follows is a deep explanation of each relevant part of it.
 
 ## A closer look to .got.plt
 Let's explore s7's .got.plt with radare2:
