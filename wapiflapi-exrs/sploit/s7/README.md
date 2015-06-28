@@ -521,4 +521,4 @@ To run the exploit are necessary:
 
 The exploit python file and binexpect.py must be in the same directory of s7 executable.
 
-[![asciicast](https://asciinema.org/a/109u7q265ukphpw01tsgxo53e.png)](https://asciinema.org/a/109u7q265ukphpw01tsgxo53e)
+[![asciicast](https://asciinema.org/a/649n0pc8iglf1asmse6s1ea71.png)](https://asciinema.org/a/649n0pc8iglf1asmse6s1ea71)
