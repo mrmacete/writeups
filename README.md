@@ -1,5 +1,5 @@
 # writeups
-Here is a collection of my writeups on the topic of reverse engineering and binary exploitation.
+Here is a collection of my writeups on the topic of reverse engineering and binary exploitation. All of them make use of free (as in freedom) open source software. My platform of choice is Linux, so the majority of the content here will be targeted to it. Occasionally there will be arm and mips platforms, but definitely no Windows around here.
 
 ## wapiflapi's exrs
 
