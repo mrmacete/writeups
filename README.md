@@ -10,3 +10,8 @@ These are solutions to some of [wapiflapi's exrs](https://github.com/wapiflapi/e
 * [Solution to s7](https://github.com/mrmacete/writeups/tree/master/wapiflapi-exrs/sploit/s7)
 * [Solution to s8](https://github.com/mrmacete/writeups/tree/master/wapiflapi-exrs/sploit/s8)
 
+## crackmes.de
+
+Here is a selection of [my solutions to crackmes.de](http://crackmes.de/users/mrmacete/)'s challanges
+
+* [Solution to arm_kgme1](https://github.com/mrmacete/writeups/tree/master/crackmes.de/arm_kgme1) (a virtual machine in ARM/linux)
