@@ -15,3 +15,4 @@ These are solutions to some of [wapiflapi's exrs](https://github.com/wapiflapi/e
 Here is a selection of [my solutions to crackmes.de](http://crackmes.de/users/mrmacete/)'s challanges
 
 * [Solution to arm_kgme1](https://github.com/mrmacete/writeups/tree/master/crackmes.de/arm_kgme1) (a virtual machine in ARM/linux)
+* [Solution to 1337_ARM](https://github.com/mrmacete/writeups/tree/master/crackmes.de/1337_ARM)
