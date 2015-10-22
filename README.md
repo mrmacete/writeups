@@ -16,3 +16,7 @@ Here is a selection of [my solutions to crackmes.de](http://crackmes.de/users/mr
 
 * [Solution to arm_kgme1](https://github.com/mrmacete/writeups/tree/master/crackmes.de/arm_kgme1) (a virtual machine in ARM/linux)
 * [Solution to 1337_ARM](https://github.com/mrmacete/writeups/tree/master/crackmes.de/1337_ARM)
+
+## samsclass
+
+Solution to [Proj 13x: 64-Bit Remote Buffer Overflow with ASLR](https://github.com/mrmacete/writeups/tree/master/samsclass/p13x)
