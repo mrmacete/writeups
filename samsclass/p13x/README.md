@@ -270,7 +270,7 @@ Equipped with all the above, it is possible to write a working exploit, which co
 Here is one of the possible buffer designs for a successful buffer overflow attack:
 
 Chunk len | Content 
-----------+--------
+----------|---------
 0x2b0     | 'A' sequence padding
 0x8       | frame pointer overwrite (unused, can be 'A'*8 )
 0x8       | pointer to shellcode ( buffer addr + 0x2b0 +8 + 8)
