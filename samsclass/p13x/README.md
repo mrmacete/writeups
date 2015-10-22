@@ -1,5 +1,4 @@
 #Sam's p13x solution
---
 
 Here is the original challange page: [https://samsclass.info/127/proj/p13x-64bo-remote.htm](https://samsclass.info/127/proj/p13x-64bo-remote.htm).
 
