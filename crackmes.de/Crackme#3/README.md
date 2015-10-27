@@ -95,7 +95,7 @@ Here are the utility functions, implemented by calling the corresponding linux s
 	│           0x08048300   mov ebx, 0
 	╘           0x08048305   int 0x80
 
-Note that since it's not using the standard C library, the strings are not zero-terminated and explicit lengths are passed in order to print only a part of the string at a time.
+Note that since it's not using the standard C library, the strings are not zero-terminated and explicit lengths are passed in order to print only a part of the string at a time. In order to decode linux 32 bit syscalls i used this: [http://syscalls.kernelgrok.com/](http://syscalls.kernelgrok.com/).
 
 
 The serial checking
