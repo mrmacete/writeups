@@ -309,7 +309,7 @@ mangle_string
 	                                  | ret            |
 	                                  =----------------=
 
-The value of dl register comes initially from the least significant byte of the computed magic, and the is always updated in this function.
+The value of `dl` register comes initially from the least significant byte of the computed magic, and the is always updated in this function.
 
 Here is the equivalent in python:
 
