@@ -3,7 +3,7 @@ Kwisatz Haderach's berkeley - mrmacete's solution
 
 Original challange is [here](http://crackmes.de/users/kwisatz_haderach/berkeley/).
 
-I know this challange has been already solved by the great @acruel, but i wanted to do it my way.
+I know this challange has been already solved by the great @acru3l, but i wanted to do it my way.
 
 Identification
 --------------
