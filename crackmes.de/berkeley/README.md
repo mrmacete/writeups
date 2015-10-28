@@ -170,7 +170,7 @@ In the above cited kernel's doc resource, there is also mention to the bpf_dbg t
 	$ make
 	$ sudo make install
 
-Now there's a shiny bpf_dbg executable, but first it is necessary to convert the binary dump to the funny comma separated integer tuple format, i made the translate.py script to do exactly that:
+Now there's a shiny bpf_dbg executable, but first it is necessary to convert the binary dump to the funny comma separated integer tuple format, i made the [translate.py](translate.py) script to do exactly that:
 
 	$ python translate.py bpf.bin 
 	48,40 0 0 12,21 0 45 2048,48 0 0 23,21 0 43 17,32 0 0 26,21 0 41 3232235521,40 0 0 20,177 0 0 14,72 0 0 16,21 0 37 34807,72 0 0 14,21 0 35 17352,72 0 0 18,21 0 33 40,64 0 0 22,4 0 0 354714897,20 0 0 1985472326,21 0 29 0,64 0 0 26,4 0 0 309683272,20 0 0 1940821376,21 0 25 0,64 0 0 30,4 0 0 1133008658,20 0 0 2011872071,21 0 21 0,64 0 0 34,4 0 0 2534499458,20 0 0 3494365877,21 0 17 0,64 0 0 38,4 0 0 1901431107,20 0 0 2726870697,21 0 13 0,64 0 0 42,4 0 0 558138963,20 0 0 1467869832,21 0 9 0,64 0 0 46,4 0 0 2300192,20 0 0 878072450,21 0 5 0,64 0 0 50,4 0 0 1899271558,20 0 0 2707868343,21 0 1 0,6 0 0 65535,6 0 0 0
