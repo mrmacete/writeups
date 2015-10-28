@@ -1,18 +1,20 @@
 Kwisatz Haderach's berkeley - mrmacete's solution
 =================================================
 
-I know this challange has been aready solved by the great @acruel, but i wanted to do it my way.
+Original challange is [here](http://crackmes.de/users/kwisatz_haderach/berkeley/).
+
+I know this challange has been already solved by the great @acruel, but i wanted to do it my way.
 
 Identification
 --------------
 
-# file berkeley 
-	berkeley: ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.26, BuildID[sha1]=89742e827532233ed6374b94e205dff08580594e, stripped
-
+	# file berkeley 
+		berkeley: ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.26, BuildID[sha1]=89742e827532233ed6374b94e205dff08580594e, stripped
+	
 This is a 32 bit executable, i tested it successfully on my ubuntu bitch:
-
-# uname -a
-	Linux pooper 3.19.0-25-generic #26-Ubuntu SMP Fri Jul 24 21:16:27 UTC 2015 i686 i686 i686 GNU/Linux
+	
+	# uname -a
+		Linux pooper 3.19.0-25-generic #26-Ubuntu SMP Fri Jul 24 21:16:27 UTC 2015 i686 i686 i686 GNU/Linux
 
 
 Reconnaissance with r2
@@ -50,29 +52,25 @@ Basically it calls a function passing a pointer to it. Let's see the core of the
 	 0x0804861a   call sym.imp.setsockopt
 
 
-In order to find the proper values for constants in socket() call, after freaking out not finding them using google, i ended up using grep in /usr/include, like this:
+In order to find the proper values for constants in `socket()` call, after freaking out not finding them using google, i ended up using `grep` in `/usr/include`, like this:
 
 1. where are the socket "domains" defined?
 	
 	mrmacete@pooper:/usr/include$ grep -r AF_INET * | grep "#define"
-
 	i386-linux-gnu/bits/socket.h:#define AF_INET		PF_INET
 
 2. where are the socket "types" defined?
 
 	mrmacete@pooper:/usr/include$ grep -r SOCK_STREAM * | grep "#define"
-	
 	i386-linux-gnu/bits/socket_type.h:#define SOCK_STREAM SOCK_STREAM
 
-3. where are the socket "protocols" defined? No answer, in fact i accepted to content myself with htons(3) for now.
+3. where are the socket "protocols" defined? No answer, in fact i accepted to content myself with `htons(3)` for now.
 
-
-Same procedure for constant names in the setsockopt() call:
+Same procedure for constant names in the `setsockopt()` call:
 
 1. where are "levels" defined?
 
 	mrmacete@pooper:/usr/include$ grep -r SOL_SOCKET * | grep "#define"
-	
 	asm-generic/socket.h:#define SOL_SOCKET	1
 
 It turns out also "optnames" are defined in the same file, fortunately.
@@ -80,33 +78,36 @@ It turns out also "optnames" are defined in the same file, fortunately.
 Following the white rabbit
 --------------------------
 
-Well, what the hell is SO_ATTACH_FILTER ? This time i asked it directly to google, and the answer was this really interesting thing:
+Well, what the hell is `SO_ATTACH_FILTER` ? This time i asked it directly to google, and the answer was this really interesting thing:
 
-https://www.kernel.org/doc/Documentation/networking/filter.txt
+[https://www.kernel.org/doc/Documentation/networking/filter.txt](https://www.kernel.org/doc/Documentation/networking/filter.txt)
 
-Apparently it's there for 1993, it's a compiled language to build packet filters from userland, letting the kernel apply them to raw sockets, but it seems used also for some type general purpose computation.
+Apparently it's there for 1993, it's a compiled language (called BPF) to build packet filters from userland, letting the kernel apply them to raw sockets, but it seems used also for some type general purpose computation.
 
 Here is how it is used in the crackme, in a nutshell:
 
 1. Somewhere in the binary exist the filter array, i.e. the compiled filter code, expressed as an array of these structs:
 
+```c
 	struct sock_filter {	/* Filter block */
 		__u16	code;   /* Actual filter code */
 		__u8	jt;	/* Jump true */
 		__u8	jf;	/* Jump false */
 		__u32	k;      /* Generic multiuse field */
 	};
+```
 
+2. using `setsockopt()`, this is bound to the socket of choice by passing a pointer to a struct of this type:
 
-2. using setsockopt(), this is bound to the socket of choice by passing a pointer to a struct of this type:
-
+```c
 	struct sock_fprog {			/* Required for SO_ATTACH_FILTER. */
 		unsigned short		   len;	/* Number of filter blocks */
 		struct sock_filter __user *filter;
 	};
-
+```
 Interestingly at some point at that paper there's this snippet, which is almost the same of what found inside the crackme binary:
 
+```c
 	sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 	if (sock < 0)
 		/* ... bail out ... */
@@ -114,15 +115,16 @@ Interestingly at some point at that paper there's this snippet, which is almost 
 	ret = setsockopt(sock, SOL_SOCKET, SO_ATTACH_FILTER, &bpf, sizeof(bpf));
 	if (ret < 0)
 		/* ... bail out ... */
+```
 
-This means we have a name for that disturbing htons(3) above!
+This means we have a name for that disturbing `htons(3)` above!
 
-In our case, the sock_fprog struct lives in the arg_2, at address 0x8049bc0. Let's see it with r2:
+In our case, the `sock_fprog` struct lives in the `arg_2`, at address `0x8049bc0`. Let's see it with r2:
 
 	:> pxw 8 @ 0x8049bc0
 	0x08049bc0  0x00000030 0x08049a40
 
-So there are 48 sock_filter structs starting at 0x08049a40, here they are:
+So there are 48 `sock_filter` structs starting at `0x08049a40`, here they are:
 
 	:> pxc 8*48 @ 0x08049a40
 	- offset -   0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
@@ -171,23 +173,20 @@ In the above cited kernel's doc resource, there is also mention to the bpf_dbg t
 Now there's a shiny bpf_dbg executable, but first it is necessary to convert the binary dump to the funny comma separated integer tuple format, i made the translate.py script to do exactly that:
 
 	$ python translate.py bpf.bin 
-	
 	48,40 0 0 12,21 0 45 2048,48 0 0 23,21 0 43 17,32 0 0 26,21 0 41 3232235521,40 0 0 20,177 0 0 14,72 0 0 16,21 0 37 34807,72 0 0 14,21 0 35 17352,72 0 0 18,21 0 33 40,64 0 0 22,4 0 0 354714897,20 0 0 1985472326,21 0 29 0,64 0 0 26,4 0 0 309683272,20 0 0 1940821376,21 0 25 0,64 0 0 30,4 0 0 1133008658,20 0 0 2011872071,21 0 21 0,64 0 0 34,4 0 0 2534499458,20 0 0 3494365877,21 0 17 0,64 0 0 38,4 0 0 1901431107,20 0 0 2726870697,21 0 13 0,64 0 0 42,4 0 0 558138963,20 0 0 1467869832,21 0 9 0,64 0 0 46,4 0 0 2300192,20 0 0 878072450,21 0 5 0,64 0 0 50,4 0 0 1899271558,20 0 0 2707868343,21 0 1 0,6 0 0 65535,6 0 0 0
 
 Let's disassemble it:
 
-	$bpf_dbg 
-	
+	$ bpf_dbg 
 	> load bpf 48,40 0 0 12,21 0 45 2048,48 0 0 23,21 0 43 17,32 0 0 26,21 0 41 3232235521,40 0 0 20,177 0 0 14,72 0 0 16,21 0 37 34807,72 0 0 14,21 0 35 17352,72 0 0 18,21 0 33 40,64 0 0 22,4 0 0 354714897,20 0 0 1985472326,21 0 29 0,64 0 0 26,4 0 0 309683272,20 0 0 1940821376,21 0 25 0,64 0 0 30,4 0 0 1133008658,20 0 0 2011872071,21 0 21 0,64 0 0 34,4 0 0 2534499458,20 0 0 3494365877,21 0 17 0,64 0 0 38,4 0 0 1901431107,20 0 0 2726870697,21 0 13 0,64 0 0 42,4 0 0 558138963,20 0 0 1467869832,21 0 9 0,64 0 0 46,4 0 0 2300192,20 0 0 878072450,21 0 5 0,64 0 0 50,4 0 0 1899271558,20 0 0 2707868343,21 0 1 0,6 0 0 65535,6 0 0 0
-	
 	> disassemble
 
-
 Before commenting the disassembly, a bit of context: 
-	+ all addresses are offsets inside the raw packet
-	+ ok but which packet? the root packet! here is assumed to be an ETHERNET frame (https://en.wikipedia.org/wiki/Ethernet_frame)
-	+ the main functionality and structure of the language are described in the kernel doc above, while the example are poorly commented
-	+ here is a resource with some commented examples, to let regular humans like me understand it (thanks ellzey!): https://gist.github.com/ellzey/1111503
+	
+	* all addresses are offsets inside the raw packet
+	* ok but which packet? the root packet! here is assumed to be an [ETHERNET frame](https://en.wikipedia.org/wiki/Ethernet_frame)
+	* the main functionality and structure of the language are described in the kernel doc above, while the example are poorly commented
+	* here is a resource with some commented examples, to let regular humans like me understand it (thanks ellzey!): [https://gist.github.com/ellzey/1111503](https://gist.github.com/ellzey/1111503)
 
 Ok, this is the commented disassembly of the packet filter code:
 
@@ -326,19 +325,19 @@ And see it congratulate us in the first terminal:
 As a side note, the nping util is part of the nmap package, on ubuntu get it using apt-get install nmap
 
 
-External reference
-------------------
+External references
+-------------------
 
-Here are all the resources i found which are helpful to understand all of the above:
+Here are again all the resources i found which are helpful to understand all of the above:
 
-https://www.kernel.org/doc/Documentation/networking/filter.txt
-https://gist.github.com/ellzey/1111503
-https://en.wikipedia.org/wiki/Ethernet_frame
-https://en.wikipedia.org/wiki/EtherType#Examples
-https://en.wikipedia.org/wiki/IPv4#Header
-https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
-https://it.wikipedia.org/wiki/User_Datagram_Protocol
-https://nmap.org/book/nping-man.html
+[https://www.kernel.org/doc/Documentation/networking/filter.txt](https://www.kernel.org/doc/Documentation/networking/filter.txt)
+[https://gist.github.com/ellzey/1111503](https://gist.github.com/ellzey/1111503)
+[https://en.wikipedia.org/wiki/Ethernet_frame](https://en.wikipedia.org/wiki/Ethernet_frame)
+[https://en.wikipedia.org/wiki/EtherType#Examples](https://en.wikipedia.org/wiki/EtherType#Examples)
+[https://en.wikipedia.org/wiki/IPv4#Header](https://en.wikipedia.org/wiki/IPv4#Header)
+[https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)
+[https://it.wikipedia.org/wiki/User_Datagram_Protocol](https://it.wikipedia.org/wiki/User_Datagram_Protocol)
+[https://nmap.org/book/nping-man.html](https://nmap.org/book/nping-man.html)
 
 
 
