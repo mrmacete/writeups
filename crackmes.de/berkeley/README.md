@@ -56,13 +56,13 @@ In order to find the proper values for constants in `socket()` call, after freak
 
 1. where are the socket "domains" defined?
 	
-	mrmacete@pooper:/usr/include$ grep -r AF_INET * | grep "#define"
-	i386-linux-gnu/bits/socket.h:#define AF_INET		PF_INET
+		mrmacete@pooper:/usr/include$ grep -r AF_INET * | grep "#define"
+		i386-linux-gnu/bits/socket.h:#define AF_INET		PF_INET
 
 2. where are the socket "types" defined?
 
-	mrmacete@pooper:/usr/include$ grep -r SOCK_STREAM * | grep "#define"
-	i386-linux-gnu/bits/socket_type.h:#define SOCK_STREAM SOCK_STREAM
+		mrmacete@pooper:/usr/include$ grep -r SOCK_STREAM * | grep "#define"
+		i386-linux-gnu/bits/socket_type.h:#define SOCK_STREAM SOCK_STREAM
 
 3. where are the socket "protocols" defined? No answer, in fact i accepted to content myself with `htons(3)` for now.
 
@@ -70,8 +70,8 @@ Same procedure for constant names in the `setsockopt()` call:
 
 1. where are "levels" defined?
 
-	mrmacete@pooper:/usr/include$ grep -r SOL_SOCKET * | grep "#define"
-	asm-generic/socket.h:#define SOL_SOCKET	1
+		mrmacete@pooper:/usr/include$ grep -r SOL_SOCKET * | grep "#define"
+		asm-generic/socket.h:#define SOL_SOCKET	1
 
 It turns out also "optnames" are defined in the same file, fortunately.
 
@@ -183,10 +183,10 @@ Let's disassemble it:
 
 Before commenting the disassembly, a bit of context: 
 	
-	* all addresses are offsets inside the raw packet
-	* ok but which packet? the root packet! here is assumed to be an [ETHERNET frame](https://en.wikipedia.org/wiki/Ethernet_frame)
-	* the main functionality and structure of the language are described in the kernel doc above, while the example are poorly commented
-	* here is a resource with some commented examples, to let regular humans like me understand it (thanks ellzey!): [https://gist.github.com/ellzey/1111503](https://gist.github.com/ellzey/1111503)
+* all addresses are offsets inside the raw packet
+* ok but which packet? the root packet! here is assumed to be an [ETHERNET frame](https://en.wikipedia.org/wiki/Ethernet_frame)
+* the main functionality and structure of the language are described in the kernel doc above, while the example are poorly commented
+* here is a resource with some commented examples, to let regular humans like me understand it (thanks ellzey!): [https://gist.github.com/ellzey/1111503](https://gist.github.com/ellzey/1111503)
 
 Ok, this is the commented disassembly of the packet filter code:
 
@@ -330,14 +330,21 @@ External references
 
 Here are again all the resources i found which are helpful to understand all of the above:
 
-[https://www.kernel.org/doc/Documentation/networking/filter.txt](https://www.kernel.org/doc/Documentation/networking/filter.txt)
-[https://gist.github.com/ellzey/1111503](https://gist.github.com/ellzey/1111503)
-[https://en.wikipedia.org/wiki/Ethernet_frame](https://en.wikipedia.org/wiki/Ethernet_frame)
-[https://en.wikipedia.org/wiki/EtherType#Examples](https://en.wikipedia.org/wiki/EtherType#Examples)
-[https://en.wikipedia.org/wiki/IPv4#Header](https://en.wikipedia.org/wiki/IPv4#Header)
-[https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)
-[https://it.wikipedia.org/wiki/User_Datagram_Protocol](https://it.wikipedia.org/wiki/User_Datagram_Protocol)
-[https://nmap.org/book/nping-man.html](https://nmap.org/book/nping-man.html)
+https://www.kernel.org/doc/Documentation/networking/filter.txt
+
+https://gist.github.com/ellzey/1111503
+
+https://en.wikipedia.org/wiki/Ethernet_frame
+
+https://en.wikipedia.org/wiki/EtherType#Examples
+
+https://en.wikipedia.org/wiki/IPv4#Header
+
+https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
+
+https://it.wikipedia.org/wiki/User_Datagram_Protocol
+
+https://nmap.org/book/nping-man.html
 
 
 
