@@ -20,7 +20,7 @@ This is a 32 bit executable, i tested it successfully on my ubuntu bitch:
 Reconnaissance with r2
 ----------------------
 
-I'll try to reduce this section to the bone, here's the relevant lines main():
+I'll try to reduce this section to the bone, here's the relevant lines in main():
 
 	 0x08048648   mov dword [esp], 0x8049bc0
 	 0x0804864f   call fcn.080485ac
@@ -82,7 +82,7 @@ Well, what the hell is `SO_ATTACH_FILTER` ? This time i asked it directly to goo
 
 [https://www.kernel.org/doc/Documentation/networking/filter.txt](https://www.kernel.org/doc/Documentation/networking/filter.txt)
 
-Apparently it's there for 1993, it's a compiled language (called BPF) to build packet filters from userland, letting the kernel apply them to raw sockets, but it seems used also for some type general purpose computation.
+Apparently it's there since 1993, it's a compiled language (called BPF) to build packet filters from userland, letting the kernel apply them to raw sockets, but it seems used also for some type general purpose computation.
 
 Here is how it is used in the crackme, in a nutshell:
 
@@ -185,7 +185,7 @@ Before commenting the disassembly, a bit of context:
 	
 * all addresses are offsets inside the raw packet
 * ok but which packet? the root packet! here is assumed to be an [ETHERNET frame](https://en.wikipedia.org/wiki/Ethernet_frame)
-* the main functionality and structure of the language are described in the kernel doc above, while the example are poorly commented
+* the main functionality and structure of the language are described in the kernel doc above, while the examples are poorly commented
 * here is a resource with some commented examples, to let regular humans like me understand it (thanks ellzey!): [https://gist.github.com/ellzey/1111503](https://gist.github.com/ellzey/1111503)
 
 Ok, this is the commented disassembly of the packet filter code:
@@ -322,7 +322,7 @@ And see it congratulate us in the first terminal:
 
 	[+] Good job!
 
-As a side note, the nping util is part of the nmap package, on ubuntu get it using apt-get install nmap
+As a side note, the nping util is part of the nmap package, on ubuntu get it using `apt-get install nmap`
 
 
 External references
