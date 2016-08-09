@@ -341,3 +341,5 @@ Buried in the above command line there's also another mystery i lost an interest
 [![asciicast](https://asciinema.org/a/6q6cvq2i1xdwsjrq2o5we4vad.png)](https://asciinema.org/a/6q6cvq2i1xdwsjrq2o5we4vad)
 
 Hey! This time is faster. Still there's space for improvements, i guess it's possible to go down the list of slowdown probability unrolled above until rewriting the BIOS in C, for example. Honestly enough, though, the python RCore plugin seems pretty fast to me.
+
+(by mrmacete)
