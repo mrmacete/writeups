@@ -155,7 +155,7 @@ $ r2 -b 16 HardDisk
 [0000:0000]> aeim 0x2000 0xffff
 [0000:0000]> aeip
 [0000:0000]> e io.cache=true
-[0000:0000]> e cmd.esil.intr=#!pipe python bios_pipe.py
+[0000:0000]> "e cmd.esil.intr=#!pipe python bios_pipe.py"
 [0000:0000]> e esil.gotolimit=0xffff
 [0000:0000]> ! (sleep 30 && killall -3 r2)&
 [0000:0000]> aec
@@ -201,7 +201,7 @@ This let us write in the current session's memory without having r2 to write it 
 --
 
 ```r2
-[0000:0000]> e cmd.esil.intr=#!pipe python bios_pipe.py
+[0000:0000]> "e cmd.esil.intr=#!pipe python bios_pipe.py"
 ```
 This, in pseudo english, means: "Every time there's an ESIL interrupt (`$` instruction), spawn this python script and pass it the number of the interrupt as argument". This will load and execute the bios depicted above.
 
