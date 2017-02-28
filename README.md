@@ -1,6 +1,14 @@
 # writeups
 Here is a collection of my writeups on the topic of reverse engineering and binary exploitation. All of them make use of free (as in freedom) open source software. My platform of choice is Linux, so the majority of the content here will be targeted to it. Occasionally there will be arm and mips platforms, but definitely no Windows around here.
 
+## rhme2
+
+This is what worths to be shared of my work on Riscure's [rhme2 challange](http://rhme.riscure.com/challenges)
+
+- [fridge vm plugin for radare2](https://github.com/mrmacete/writeups/tree/master/rhme2/fridge-plugin)
+
+I'll write something up later, if it turns out i did something different than the most ranked teams.
+
 ## wapiflapi's exrs
 
 These are solutions to some of [wapiflapi's exrs](https://github.com/wapiflapi/exrs)
