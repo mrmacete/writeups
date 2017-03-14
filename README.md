@@ -6,6 +6,7 @@ Here is a collection of my writeups on the topic of reverse engineering and bina
 This is what worths to be shared of my work on Riscure's [rhme2 challange](http://rhme.riscure.com/challenges)
 
 - [fridge vm plugin for radare2](https://github.com/mrmacete/writeups/tree/master/rhme2/fridge-plugin)
+- [Owning the fridge (as a software guy)](https://github.com/mrmacete/writeups/tree/master/rhme2/writeups/owning_the_fridge.md)
 
 I'll write something up later, if it turns out i did something different than the most ranked teams.
 
