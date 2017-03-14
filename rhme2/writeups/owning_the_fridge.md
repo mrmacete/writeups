@@ -1659,7 +1659,7 @@ $ rasm2 -a fridge -f superchain.asm
 
 ### The outer logic (in rushed python)
 
-```
+```python
 import serial
 import binascii
 import sys
