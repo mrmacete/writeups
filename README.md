@@ -8,8 +8,6 @@ This is what worths to be shared of my work on Riscure's [rhme2 challange](http:
 - [fridge vm plugin for radare2](https://github.com/mrmacete/writeups/tree/master/rhme2/fridge-plugin)
 - [Owning the fridge (as a software guy)](https://github.com/mrmacete/writeups/tree/master/rhme2/writeups/owning_the_fridge.md)
 
-I'll write something up later, if it turns out i did something different than the most ranked teams.
-
 ## wapiflapi's exrs
 
 These are solutions to some of [wapiflapi's exrs](https://github.com/wapiflapi/exrs)
